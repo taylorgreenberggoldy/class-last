@@ -1,0 +1,32 @@
+---
+title: "Trains"
+author: "Taylor Greenberg Goldy"
+date: "3/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(gov.1005.data)
+library(tidyverse)
+library(infer)
+```
+
+```{r}
+treated_income <- train %>%
+  filter(treatment == "Treated") %>%
+  rep_sample_n(size = 51, replace = TRUE, reps = 50) %>%
+  group_by(replicate) %>%
+  summarize(avg_inc = mean(income)) %>%
+  pull(avg_inc) %>%
+  quantile(c(0.025, 0.975))
+
+income_level <- train %>%
+  group_by(treatment) %>%
+  summarize(avg_inc = mean(income)) %>%
+  pivot_wider(names_from = treatment, values_from = avg_inc) %>%
+  mutate(inc_diff = Treated - Control)
+
+```
+
+average income for treated 
